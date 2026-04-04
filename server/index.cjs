@@ -26,21 +26,24 @@ const io = new Server(httpServer, {
   transports: ['websocket', 'polling'],
 });
 
+// Serve frontend FIRST (before json-server intercepts '/')
+const DIST = path.join(__dirname, '../dist');
+if (fs.existsSync(DIST)) {
+  app.use(express.static(DIST));
+}
+
 // JSON Server router
 const router = jsonServer.router(DB_FILE);
-const middlewares = jsonServer.defaults({ noCors: true });
+const middlewares = jsonServer.defaults({ noCors: true, static: false });
 
 app.use(middlewares);
 app.use('/items', router.db ? (req, _res, next) => { next(); } : (_r, _s, next) => next());
 app.use(router);
 
-// Serve frontend (production)
-const DIST = path.join(__dirname, '../dist');
+// SPA fallback (after API routes)
 if (fs.existsSync(DIST)) {
-  app.use(express.static(DIST));
   app.get('*', (_req, res) => res.sendFile(path.join(DIST, 'index.html')));
 }
-
 // Socket events
 io.on('connection', (socket) => {
   console.log(`[WS] client connected: ${socket.id}`);
