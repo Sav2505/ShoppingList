@@ -15,7 +15,7 @@ export type NewItemPayload = Pick<ShoppingItem, 'name' | 'category' | 'quantity'
 export const CATEGORY_LABELS: Record<Category, string> = {
   supermarket: 'סופר',
   pharmacy: 'בית מרקחת',
-  home: 'בית',
+  home: 'לבית',
   other: 'אחר',
 };
 
