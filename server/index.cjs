@@ -1,4 +1,11 @@
 // server/index.cjs — Socket.IO + MongoDB Atlas
+// Fix TLS compatibility between Node.js 22 / OpenSSL 3 and MongoDB Atlas
+const tls = require('tls');
+const origCiphers = tls.DEFAULT_CIPHERS || '';
+if (!origCiphers.includes('@SECLEVEL')) {
+  tls.DEFAULT_CIPHERS = origCiphers + ':@SECLEVEL=0';
+}
+
 const path = require('path');
 const fs = require('fs');
 
