@@ -38,7 +38,10 @@ if (fs.existsSync(DIST)) {
 
 // MongoDB connection — start server only after DB is ready
 let itemsCollection;
-MongoClient.connect(MONGODB_URI)
+MongoClient.connect(MONGODB_URI, {
+  tls: true,
+  serverApi: { version: '1' },
+})
   .then((client) => {
     itemsCollection = client.db('shopping').collection('items');
     console.log('[DB] Connected to MongoDB Atlas');
