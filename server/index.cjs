@@ -34,7 +34,7 @@ if (fs.existsSync(DIST)) {
 
 // JSON Server router
 const router = jsonServer.router(DB_FILE);
-const middlewares = jsonServer.defaults({ noCors: true, static: false });
+const middlewares = jsonServer.defaults({ noCors: true });
 
 app.use(middlewares);
 app.use('/items', router.db ? (req, _res, next) => { next(); } : (_r, _s, next) => next());
