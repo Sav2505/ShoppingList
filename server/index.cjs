@@ -32,12 +32,17 @@ if (fs.existsSync(DIST)) {
   app.use(express.static(DIST));
 }
 
-// MongoDB connection
+// MongoDB connection — start server only after DB is ready
 let itemsCollection;
 MongoClient.connect(MONGODB_URI)
   .then((client) => {
     itemsCollection = client.db('shopping').collection('items');
     console.log('[DB] Connected to MongoDB Atlas');
+    httpServer.listen(PORT, () => {
+      console.log(`[SERVER] Running on port ${PORT}`);
+      console.log(`[WS]     Socket.IO ready`);
+      if (fs.existsSync(DIST)) console.log('[STATIC] Serving frontend from dist/');
+    });
   })
   .catch((err) => {
     console.error('[DB] Connection failed:', err.message);
@@ -118,12 +123,6 @@ io.on('connection', (socket) => {
   socket.on('item:undo', (item) => socket.broadcast.emit('item:undo', item));
   socket.on('item:deleted', (id) => socket.broadcast.emit('item:deleted', id));
   socket.on('disconnect', () => console.log(`[WS] client disconnected: ${socket.id}`));
-});
-
-httpServer.listen(PORT, () => {
-  console.log(`[SERVER] Running on port ${PORT}`);
-  console.log(`[WS]     Socket.IO ready`);
-  if (fs.existsSync(DIST)) console.log('[STATIC] Serving frontend from dist/');
 });
 
 httpServer.on('error', (err) => {
