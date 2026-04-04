@@ -1,11 +1,4 @@
 // server/index.cjs — Socket.IO + MongoDB Atlas
-// Fix TLS compatibility between Node.js 22 / OpenSSL 3 and MongoDB Atlas
-const tls = require('tls');
-const origCiphers = tls.DEFAULT_CIPHERS || '';
-if (!origCiphers.includes('@SECLEVEL')) {
-  tls.DEFAULT_CIPHERS = origCiphers + ':@SECLEVEL=0';
-}
-
 const path = require('path');
 const fs = require('fs');
 
@@ -45,10 +38,7 @@ if (fs.existsSync(DIST)) {
 
 // MongoDB connection — start server only after DB is ready
 let itemsCollection;
-MongoClient.connect(MONGODB_URI, {
-  tls: true,
-  serverApi: { version: '1' },
-})
+MongoClient.connect(MONGODB_URI)
   .then((client) => {
     itemsCollection = client.db('shopping').collection('items');
     console.log('[DB] Connected to MongoDB Atlas');
