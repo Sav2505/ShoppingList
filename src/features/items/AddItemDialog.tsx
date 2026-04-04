@@ -122,9 +122,6 @@ export function AddItemDialog({ open, onClose, onSubmit }: AddItemDialogProps) {
                     <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
                         קטגוריה
                     </Typography>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
-                        קטגוריה
-                    </Typography>
                     <Select
                         value={category}
                         onChange={(e: SelectChangeEvent) => setCategory(e.target.value as Category)}
