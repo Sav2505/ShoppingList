@@ -1,12 +1,16 @@
 // server/index.cjs — Socket.IO + MongoDB Atlas
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+const path = require('path');
+const fs = require('fs');
+
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+}
 
 const express = require('express');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 const { MongoClient } = require('mongodb');
-const path = require('path');
-const fs = require('fs');
 
 const PORT = process.env.PORT || 3030;
 const MONGODB_URI = process.env.MONGODB_URI;
