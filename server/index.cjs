@@ -6,7 +6,7 @@ const jsonServer = require('json-server');
 const path = require('path');
 const fs = require('fs');
 
-const PORT = 3030;
+const PORT = process.env.PORT || 3030;
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // Ensure db.json exists
@@ -33,6 +33,13 @@ const middlewares = jsonServer.defaults({ noCors: true });
 app.use(middlewares);
 app.use('/items', router.db ? (req, _res, next) => { next(); } : (_r, _s, next) => next());
 app.use(router);
+
+// Serve frontend (production)
+const DIST = path.join(__dirname, '../dist');
+if (fs.existsSync(DIST)) {
+  app.use(express.static(DIST));
+  app.get('*', (_req, res) => res.sendFile(path.join(DIST, 'index.html')));
+}
 
 // Socket events
 io.on('connection', (socket) => {
@@ -64,15 +71,17 @@ io.on('connection', (socket) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`[SERVER] Running on http://localhost:${PORT}`);
+  console.log(`[SERVER] Running on port ${PORT}`);
   console.log(`[REST]   GET/POST/PATCH/DELETE /items`);
   console.log(`[WS]     Socket.IO ready`);
+  if (fs.existsSync(path.join(__dirname, '../dist'))) {
+    console.log(`[STATIC] Serving frontend from dist/`);
+  }
 });
 
 httpServer.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`[SERVER] Port ${PORT} is already in use.`);
-    console.error(`[SERVER] Run: npx kill-port ${PORT}  or  netstat -ano | findstr :${PORT}`);
     process.exit(1);
   }
   throw err;
