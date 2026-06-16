@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <!-- AppBar gradient: same as the app header -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1A1A2E"/>
+      <stop offset="55%"  stop-color="#16213E"/>
+      <stop offset="100%" stop-color="#0F3460"/>
+    </linearGradient>
+    <!-- Badge accent: amber → red -->
+    <linearGradient id="acc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+    <!-- Subtle inner highlight on top edge -->
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0.10)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded-square background -->
+  <rect width="64" height="64" rx="13" fill="url(#bg)"/>
+
+  <!-- Inner shine on upper half -->
+  <rect x="0" y="0" width="64" height="32" rx="13" fill="url(#shine)"/>
+
+  <!-- ── Cart body ── -->
+  <!-- Handle: short horizontal line -->
+  <line
+    x1="7"  y1="18"
+    x2="17" y2="18"
+    stroke="white" stroke-width="3.5" stroke-linecap="round"
+  />
+
+  <!-- Arm + basket outline:
+       arm from handle diagonally to basket bottom-left,
+       basket bottom, right-side diagonal, basket top. -->
+  <path
+    d="M 17,18 L 22,39 H 50 L 54,25 H 22"
+    fill="rgba(255,255,255,0.08)"
+    stroke="white"
+    stroke-width="3.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Wheels: amber-red gradient -->
+  <circle cx="28" cy="48.5" r="4.5" fill="url(#acc)"/>
+  <circle cx="45" cy="48.5" r="4.5" fill="url(#acc)"/>
+
+  <!-- Wheel highlight -->
+  <circle cx="26.5" cy="47"   r="1.2" fill="rgba(255,255,255,0.5)"/>
+  <circle cx="43.5" cy="47"   r="1.2" fill="rgba(255,255,255,0.5)"/>
+</svg>
