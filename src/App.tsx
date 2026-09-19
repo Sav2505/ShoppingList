@@ -61,7 +61,7 @@ export default function App() {
               variant="h6"
               sx={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', letterSpacing: '-0.3px', lineHeight: 1.2 }}
             >
-              קניות שחר ודן
+              הקניות של נורית
             </Typography>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem' }}>
               רשימת קניות משותפת
