@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import type { Category } from '@/types/item';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddItemDialog } from './features/items/AddItemDialog';
@@ -19,6 +20,7 @@ import { useItems } from './features/items/useItems';
 import { useSocketStatus } from './hooks/useSocketStatus';
 
 export default function App() {
+  const [activeCategory, setActiveCategory] = useState<'all' | Category>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const {
     items, loading, error, snackbar,
@@ -89,7 +91,14 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
-        <ItemsList items={items} loading={loading} onMarkBought={markBought} onDelete={deleteItem} />
+        <ItemsList
+          items={items}
+          loading={loading}
+          onMarkBought={markBought}
+          onDelete={deleteItem}
+          filter={activeCategory}
+          onFilterChange={setActiveCategory}
+        />
       </Container>
 
       {/* ── Extended FAB ── */}
@@ -122,8 +131,12 @@ export default function App() {
       </Fab>
 
       {/* ── Add Dialog ── */}
-      <AddItemDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSubmit={addNewItem} />
-
+      <AddItemDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={addNewItem}
+        defaultCategory={activeCategory === 'all' ? 'supermarket' : activeCategory}
+      />
       {/* ── Undo Snackbar ── */}
       <Snackbar
         open={snackbar.open}

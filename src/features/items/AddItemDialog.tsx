@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -16,18 +16,25 @@ import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
 
 interface AddItemDialogProps {
     open: boolean;
+    defaultCategory: Category;
     onClose: () => void;
     onSubmit: (payload: NewItemPayload) => Promise<void>;
 }
 
 const CATEGORIES = Object.entries(CATEGORY_LABELS) as [Category, string][];
 
-export function AddItemDialog({ open, onClose, onSubmit }: AddItemDialogProps) {
+export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddItemDialogProps) {
     const [name, setName] = useState('');
-    const [category, setCategory] = useState<Category>('supermarket');
+    const [category, setCategory] = useState<Category>(defaultCategory);
     const [quantity, setQuantity] = useState<number>(1);
     const [submitting, setSubmitting] = useState(false);
     const [nameError, setNameError] = useState('');
+
+    useEffect(() => {
+        if (open) {
+            setCategory(defaultCategory);
+        }
+    }, [open, defaultCategory]);
 
     const handleSubmit = async () => {
         const trimmed = name.trim();
@@ -46,7 +53,6 @@ export function AddItemDialog({ open, onClose, onSubmit }: AddItemDialogProps) {
 
     const handleClose = () => {
         setName('');
-        setCategory('supermarket');
         setQuantity(1);
         setNameError('');
         onClose();
@@ -181,6 +187,13 @@ export function AddItemDialog({ open, onClose, onSubmit }: AddItemDialogProps) {
             {/* ── כפתורים ── */}
             <Box sx={{ display: 'flex', gap: 1.5, px: 3, pb: 3, pt: 1.5 }}>
                 <Button
+                    onClick={handleClose}
+                    disabled={submitting}
+                    sx={{ flex: 1, py: 1.35, borderRadius: 3, color: 'text.secondary', fontWeight: 600 }}
+                >
+                    ביטול
+                </Button>
+                <Button
                     variant="contained"
                     onClick={handleSubmit}
                     disabled={submitting}
@@ -198,13 +211,6 @@ export function AddItemDialog({ open, onClose, onSubmit }: AddItemDialogProps) {
                     }}
                 >
                     הוסף
-                </Button>
-                <Button
-                    onClick={handleClose}
-                    disabled={submitting}
-                    sx={{ flex: 1, py: 1.35, borderRadius: 3, color: 'text.secondary', fontWeight: 600 }}
-                >
-                    ביטול
                 </Button>
             </Box>
         </Dialog>

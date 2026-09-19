@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Box, Chip, Skeleton, Stack, Typography } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -12,15 +12,22 @@ interface ItemsListProps {
   loading: boolean;
   onMarkBought: (id: number) => void;
   onDelete: (id: number) => void;
+  filter: 'all' | Category;
+  onFilterChange: (category: 'all' | Category) => void;
 }
 
 const ALL_CATEGORIES: ('all' | Category)[] = ['all', 'supermarket', 'pharmacy', 'home', 'other'];
 
 const FILTER_LABELS: Record<'all' | Category, string> = { all: 'הכל', ...CATEGORY_LABELS };
 
-export function ItemsList({ items, loading, onMarkBought, onDelete }: ItemsListProps) {
-  const [filter, setFilter] = useState<'all' | Category>('all');
-
+export function ItemsList({
+  items,
+  loading,
+  onMarkBought,
+  onDelete,
+  filter,
+  onFilterChange,
+}: ItemsListProps) {
   const filtered = useMemo(
     () => (filter === 'all' ? items : items.filter((i) => i.category === filter)),
     [items, filter],
@@ -67,7 +74,7 @@ export function ItemsList({ items, loading, onMarkBought, onDelete }: ItemsListP
               key={cat}
               label={FILTER_LABELS[cat]}
               clickable
-              onClick={() => setFilter(cat)}
+              onClick={() => onFilterChange(cat)}
               sx={{
                 flexShrink: 0,
                 fontWeight: active ? 700 : 500,
