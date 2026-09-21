@@ -120,6 +120,15 @@ app.delete('/items/:id', async (req, res) => {
   }
 });
 
+app.get('/health', async (_req, res) => {
+  try {
+    await db.execute('SELECT 1');
+    res.status(200).json({ ok: true, time: new Date().toISOString() });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // SPA fallback
 if (fs.existsSync(DIST)) {
   app.get('*', (_req, res) => res.sendFile(path.join(DIST, 'index.html')));
@@ -136,13 +145,33 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log(`[WS] client disconnected: ${socket.id}`));
 });
 
-// Start — init DB first, then listen
+const KEEP_ALIVE_MS = 60 * 1000; // כל דקה
+
+function startKeepAlive() {
+  // Render מספק את המשתנה הזה אוטומטית
+  const baseUrl = process.env.RENDER_EXTERNAL_URL;
+  if (!baseUrl) {
+    console.log('[KEEPALIVE] RENDER_EXTERNAL_URL not set, skipping');
+    return;
+  }
+
+  setInterval(async () => {
+    try {
+      const r = await fetch(`${baseUrl}/health`);
+      console.log(`[KEEPALIVE] ping status ${r.status}`);
+    } catch (e) {
+      console.error('[KEEPALIVE] ping failed:', e.message);
+    }
+  }, KEEP_ALIVE_MS);
+}
+
 initDb()
   .then(() => {
     httpServer.listen(PORT, () => {
       console.log(`[SERVER] Running on port ${PORT}`);
       console.log(`[WS]     Socket.IO ready`);
       if (fs.existsSync(DIST)) console.log('[STATIC] Serving frontend from dist/');
+      startKeepAlive();
     });
   })
   .catch((err) => {
