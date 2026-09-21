@@ -33,8 +33,8 @@ export function ItemsList({
     [items, filter],
   );
 
-  const activeItems = filtered.filter((i) => !i.completed);
-  const completedItems = filtered.filter((i) => i.completed);
+  const activeItems = filtered.filter((i) => !i.completed).sort((a, b) => a.category.localeCompare(b.category));
+  const completedItems = filtered.filter((i) => i.completed).sort((a, b) => a.category.localeCompare(b.category));
   const totalActive = items.filter((i) => !i.completed).length;
 
   if (loading) {
