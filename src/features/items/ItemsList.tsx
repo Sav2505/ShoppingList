@@ -5,7 +5,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { AnimatePresence } from 'framer-motion';
 import { ItemCard } from './ItemCard';
 import type { Category, ShoppingItem } from '@/types/item';
-import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
+import { CATEGORY_COLORS, CATEGORY_LABELS, CATEGORY_ORDER } from '@/types/item';
 
 interface ItemsListProps {
   items: ShoppingItem[];
@@ -33,8 +33,12 @@ export function ItemsList({
     [items, filter],
   );
 
-  const activeItems = filtered.filter((i) => !i.completed).sort((a, b) => a.category.localeCompare(b.category));
-  const completedItems = filtered.filter((i) => i.completed).sort((a, b) => a.category.localeCompare(b.category));
+  const activeItems = filtered
+    .filter((i) => !i.completed)
+    .sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category]);
+  const completedItems = filtered
+    .filter((i) => i.completed)
+    .sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category]);
   const totalActive = items.filter((i) => !i.completed).length;
 
   if (loading) {

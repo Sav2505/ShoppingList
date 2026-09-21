@@ -1,5 +1,12 @@
 export type Category = 'supermarket' | 'pharmacy' | 'home' | 'other';
 
+export const CATEGORY_ORDER: Record<Category, number> = {
+  supermarket: 0,
+  pharmacy: 1,
+  home: 2,
+  other: 3,
+};
+
 export interface ShoppingItem {
   id: number;
   name: string;
