@@ -111,7 +111,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
                 </Typography>
                 {!duplicate && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
-                        מה צריך לקנות נורית ?
+                        מה צריך לקנות נונו ?
                     </Typography>
                 )}
             </Box>
