@@ -11,24 +11,27 @@ import {
     type SelectChangeEvent,
 } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import type { Category, NewItemPayload } from '@/types/item';
+import type { Category, NewItemPayload, ShoppingItem } from '@/types/item';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
 
 interface AddItemDialogProps {
     open: boolean;
     defaultCategory: Category;
+    items: ShoppingItem[];
     onClose: () => void;
     onSubmit: (payload: NewItemPayload) => Promise<void>;
+    onIncreaseExisting: (item: ShoppingItem, amount: number) => Promise<void>;
 }
 
 const CATEGORIES = Object.entries(CATEGORY_LABELS) as [Category, string][];
 
-export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddItemDialogProps) {
+export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit, onIncreaseExisting }: AddItemDialogProps) {
     const [name, setName] = useState('');
     const [category, setCategory] = useState<Category>(defaultCategory);
     const [quantity, setQuantity] = useState<number>(1);
     const [submitting, setSubmitting] = useState(false);
     const [nameError, setNameError] = useState('');
+    const [duplicate, setDuplicate] = useState<ShoppingItem | null>(null);
 
     useEffect(() => {
         if (open) {
@@ -42,9 +45,27 @@ export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddI
             setNameError('נא להזין שם פריט');
             return;
         }
+        const existingItem = items.find(
+            (item) => !item.completed && item.name === trimmed && item.category === category,
+        );
+        if (existingItem) {
+            setDuplicate(existingItem);
+            return;
+        }
         setSubmitting(true);
         try {
             await onSubmit({ name: trimmed, category, quantity });
+            handleClose();
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleConfirmDuplicate = async () => {
+        if (!duplicate) return;
+        setSubmitting(true);
+        try {
+            await onIncreaseExisting(duplicate, quantity);
             handleClose();
         } finally {
             setSubmitting(false);
@@ -55,6 +76,7 @@ export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddI
         setName('');
         setQuantity(1);
         setNameError('');
+        setDuplicate(null);
         onClose();
     };
 
@@ -85,13 +107,22 @@ export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddI
             {/* Title */}
             <Box sx={{ px: 3, pt: { xs: 1.5, sm: 3 }, pb: 0 }}>
                 <Typography variant="h6" fontWeight={800} sx={{ fontSize: '1.1rem' }}>
-                    הוסף פריט לרשימה
+                    {duplicate ? 'המוצר כבר קיים' : 'הוסף פריט לרשימה'}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
-                    מה צריך לקנות נונו ?
-                </Typography>
+                {!duplicate && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
+                        מה צריך לקנות נונו ?
+                    </Typography>
+                )}
             </Box>
 
+            {duplicate ? (
+                <DialogContent sx={{ pt: '20px !important', pb: 1 }}>
+                    <Typography dir="rtl" textAlign="right">
+                        המוצר הזה כבר קיים ברשימה, האם ברצונך להוסיף לכמות המוצר הקיים?
+                    </Typography>
+                </DialogContent>
+            ) : (
             <DialogContent sx={{ pt: '20px !important', pb: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
 
                 {/* ── שם הפריט ── */}
@@ -183,19 +214,20 @@ export function AddItemDialog({ open, defaultCategory, onClose, onSubmit }: AddI
                     </Box>
                 </Box>
             </DialogContent>
+            )}
 
             {/* ── כפתורים ── */}
             <Box sx={{ display: 'flex', gap: 1.5, px: 3, pb: 3, pt: 1.5 }}>
                 <Button
-                    onClick={handleClose}
+                    onClick={duplicate ? handleClose : handleClose}
                     disabled={submitting}
                     sx={{ flex: 1, py: 1.35, borderRadius: 3, color: 'text.secondary', fontWeight: 600 }}
                 >
-                    ביטול
+                    {duplicate ? 'בטל' : 'ביטול'}
                 </Button>
                 <Button
                     variant="contained"
-                    onClick={handleSubmit}
+                    onClick={duplicate ? handleConfirmDuplicate : handleSubmit}
                     disabled={submitting}
                     endIcon={<AddShoppingCartIcon sx={{ fontSize: 20 }} />}
                     sx={{
