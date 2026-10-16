@@ -219,7 +219,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
             {/* ── כפתורים ── */}
             <Box sx={{ display: 'flex', gap: 1.5, px: 3, pb: 3, pt: 1.5 }}>
                 <Button
-                    onClick={duplicate ? handleClose : handleClose}
+                    onClick={handleClose}
                     disabled={submitting}
                     sx={{ flex: 1, py: 1.35, borderRadius: 3, color: 'text.secondary', fontWeight: 600 }}
                 >

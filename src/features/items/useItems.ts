@@ -149,6 +149,29 @@ export function useItems() {
     [addItem, removeItem, setError],
   );
 
+  const increaseItemQuantity = useCallback(
+    async (item: ShoppingItem, amount: number): Promise<void> => {
+      const current = items.find((candidate) => candidate.id === item.id);
+      if (!current) return;
+
+      const updated: ShoppingItem = {
+        ...current,
+        quantity: (current.quantity ?? 1) + amount,
+      };
+      updateItem(updated);
+
+      try {
+        const saved = await itemsApi.update(item.id, { quantity: updated.quantity });
+        updateItem(saved);
+        socketEvents.emitUpdated(saved);
+      } catch {
+        updateItem(current);
+        setError('שגיאה בעדכון כמות פריט');
+      }
+    },
+    [items, updateItem, setError],
+  );
+
   const markBought = useCallback(
     async (id: number): Promise<void> => {
       const item = items.find((i) => i.id === id);
@@ -231,6 +254,7 @@ export function useItems() {
     error,
     snackbar,
     addNewItem,
+    increaseItemQuantity,
     markBought,
     undoBought,
     deleteItem,

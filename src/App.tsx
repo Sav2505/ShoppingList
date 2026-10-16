@@ -24,7 +24,7 @@ export default function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const {
     items, loading, error, snackbar,
-    addNewItem, markBought, undoBought, deleteItem, closeSnackbar,
+    addNewItem, increaseItemQuantity, markBought, undoBought, deleteItem, closeSnackbar,
   } = useItems();
   const connected = useSocketStatus();
   const activeCount = items.filter((i) => !i.completed).length;
@@ -135,6 +135,8 @@ export default function App() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onSubmit={addNewItem}
+        onIncreaseExisting={increaseItemQuantity}
+        items={items}
         defaultCategory={activeCategory === 'all' ? 'supermarket' : activeCategory}
       />
       {/* ── Undo Snackbar ── */}
