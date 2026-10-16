@@ -119,7 +119,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
             {duplicate ? (
                 <DialogContent sx={{ pt: '20px !important', pb: 1 }}>
                     <Typography dir="ltr" textAlign="right">
-                        המוצר הזה כבר קיים ברשימה, האם ברצונך להוסיף לכמות המוצר הקיים?
+                        המוצר הזה כבר קיים ברשימה, האם ברצונך להוסיף לכמות המוצר הקיים ?
                     </Typography>
                 </DialogContent>
             ) : (
