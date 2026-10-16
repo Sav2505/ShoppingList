@@ -118,102 +118,102 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
 
             {duplicate ? (
                 <DialogContent sx={{ pt: '20px !important', pb: 1 }}>
-                    <Typography dir="ltr" textAlign="right">
+                    <Typography dir="rtl" textAlign="left" sx={{ direction: "rtl", textAlign: "right" }}>
                         המוצר הזה כבר קיים ברשימה, האם ברצונך להוסיף לכמות המוצר הקיים ?
                     </Typography>
                 </DialogContent>
             ) : (
-            <DialogContent sx={{ pt: '20px !important', pb: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <DialogContent sx={{ pt: '20px !important', pb: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-                {/* ── שם הפריט ── */}
-                <Box>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
-                        שם הפריט
-                    </Typography>
-                    <TextField
-                        autoFocus
-                        value={name}
-                        placeholder="שם הפריט..."
-                        dir="rtl"
-                        onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                        error={!!nameError}
-                        helperText={nameError}
-                        fullWidth
-                        inputProps={{ maxLength: 80, dir: 'rtl', style: { textAlign: 'right' } }}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 3,
-                                fontSize: '1rem',
-                                '& input': { textAlign: 'right', padding: '12px 14px' },
-                                '& fieldset': { borderColor: nameError ? 'error.main' : 'rgba(0,0,0,0.14)' },
-                                '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.3)' },
-                                '&.Mui-focused fieldset': { borderColor: '#4F46E5' },
-                            },
-                        }}
-                    />
-                </Box>
-
-                {/* ── קטגוריה ── */}
-                <Box>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
-                        קטגוריה
-                    </Typography>
-                    <Select
-                        value={category}
-                        onChange={(e: SelectChangeEvent) => setCategory(e.target.value as Category)}
-                        fullWidth
-                        displayEmpty
-                        renderValue={(val) => (
-                            <span style={{ display: 'block', textAlign: 'right', direction: 'rtl', width: '100%' }}>
-                                {CATEGORY_LABELS[val as Category]}
-                            </span>
-                        )}
-                        inputProps={{ dir: 'rtl' }}
-                        sx={{
-                            borderRadius: 3,
-                            '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,0,0,0.14)' },
-                            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,0,0,0.3)' },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#4F46E5' },
-                            '& .MuiSelect-select': { padding: '12px 14px 12px 32px' },
-                            '& .MuiSelect-icon': { left: 7, right: 'auto' },
-                        }}
-                    >
-                        {CATEGORIES.map(([val, label]) => (
-                            <MenuItem key={val} value={val} sx={{ justifyContent: 'flex-end', gap: 1.5, direction: 'rtl' }}>
-                                {label}
-                                <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: CATEGORY_COLORS[val], flexShrink: 0 }} />
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
-
-                {/* ── כמות ── */}
-                <Box>
-                    <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
-                        כמות
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 3, border: '1px solid rgba(0,0,0,0.14)', overflow: 'hidden', '&:hover': { borderColor: 'rgba(0,0,0,0.3)' } }}>
-                        <Box
-                            component="button"
-                            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                            sx={{ width: 46, height: 46, border: 'none', bgcolor: 'transparent', fontSize: '1.3rem', cursor: 'pointer', color: 'text.secondary', '&:hover': { bgcolor: 'rgba(0,0,0,0.04)', color: 'text.primary' }, flexShrink: 0, transition: 'all 0.15s' }}
-                        >
-                            −
-                        </Box>
-                        <Typography sx={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: '1.05rem', userSelect: 'none' }}>
-                            {quantity}
+                    {/* ── שם הפריט ── */}
+                    <Box>
+                        <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
+                            שם הפריט
                         </Typography>
-                        <Box
-                            component="button"
-                            onClick={() => setQuantity((q) => Math.min(99, q + 1))}
-                            sx={{ width: 46, height: 46, border: 'none', bgcolor: 'transparent', fontSize: '1.3rem', cursor: 'pointer', color: 'text.secondary', '&:hover': { bgcolor: 'rgba(0,0,0,0.04)', color: 'text.primary' }, flexShrink: 0, transition: 'all 0.15s' }}
+                        <TextField
+                            autoFocus
+                            value={name}
+                            placeholder="שם הפריט..."
+                            dir="rtl"
+                            onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                            error={!!nameError}
+                            helperText={nameError}
+                            fullWidth
+                            inputProps={{ maxLength: 80, dir: 'rtl', style: { textAlign: 'right' } }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 3,
+                                    fontSize: '1rem',
+                                    '& input': { textAlign: 'right', padding: '12px 14px' },
+                                    '& fieldset': { borderColor: nameError ? 'error.main' : 'rgba(0,0,0,0.14)' },
+                                    '&:hover fieldset': { borderColor: 'rgba(0,0,0,0.3)' },
+                                    '&.Mui-focused fieldset': { borderColor: '#4F46E5' },
+                                },
+                            }}
+                        />
+                    </Box>
+
+                    {/* ── קטגוריה ── */}
+                    <Box>
+                        <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
+                            קטגוריה
+                        </Typography>
+                        <Select
+                            value={category}
+                            onChange={(e: SelectChangeEvent) => setCategory(e.target.value as Category)}
+                            fullWidth
+                            displayEmpty
+                            renderValue={(val) => (
+                                <span style={{ display: 'block', textAlign: 'right', direction: 'rtl', width: '100%' }}>
+                                    {CATEGORY_LABELS[val as Category]}
+                                </span>
+                            )}
+                            inputProps={{ dir: 'rtl' }}
+                            sx={{
+                                borderRadius: 3,
+                                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,0,0,0.14)' },
+                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,0,0,0.3)' },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#4F46E5' },
+                                '& .MuiSelect-select': { padding: '12px 14px 12px 32px' },
+                                '& .MuiSelect-icon': { left: 7, right: 'auto' },
+                            }}
                         >
-                            +
+                            {CATEGORIES.map(([val, label]) => (
+                                <MenuItem key={val} value={val} sx={{ justifyContent: 'flex-end', gap: 1.5, direction: 'rtl' }}>
+                                    {label}
+                                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: CATEGORY_COLORS[val], flexShrink: 0 }} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </Box>
+
+                    {/* ── כמות ── */}
+                    <Box>
+                        <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ display: 'block', mb: 0.75, fontSize: '0.78rem', letterSpacing: 0.2 }}>
+                            כמות
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, borderRadius: 3, border: '1px solid rgba(0,0,0,0.14)', overflow: 'hidden', '&:hover': { borderColor: 'rgba(0,0,0,0.3)' } }}>
+                            <Box
+                                component="button"
+                                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                sx={{ width: 46, height: 46, border: 'none', bgcolor: 'transparent', fontSize: '1.3rem', cursor: 'pointer', color: 'text.secondary', '&:hover': { bgcolor: 'rgba(0,0,0,0.04)', color: 'text.primary' }, flexShrink: 0, transition: 'all 0.15s' }}
+                            >
+                                −
+                            </Box>
+                            <Typography sx={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: '1.05rem', userSelect: 'none' }}>
+                                {quantity}
+                            </Typography>
+                            <Box
+                                component="button"
+                                onClick={() => setQuantity((q) => Math.min(99, q + 1))}
+                                sx={{ width: 46, height: 46, border: 'none', bgcolor: 'transparent', fontSize: '1.3rem', cursor: 'pointer', color: 'text.secondary', '&:hover': { bgcolor: 'rgba(0,0,0,0.04)', color: 'text.primary' }, flexShrink: 0, transition: 'all 0.15s' }}
+                            >
+                                +
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
-            </DialogContent>
+                </DialogContent>
             )}
 
             {/* ── כפתורים ── */}
