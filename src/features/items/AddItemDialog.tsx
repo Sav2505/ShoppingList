@@ -118,7 +118,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
 
             {duplicate ? (
                 <DialogContent sx={{ pt: '20px !important', pb: 1 }}>
-                    <Typography dir="rtl" textAlign="left" sx={{ direction: "rtl", textAlign: "right" }}>
+                    <Typography dir="ltr" textAlign="left" sx={{ direction: "ltr", textAlign: "right" }}>
                         המוצר הזה כבר קיים ברשימה, האם ברצונך להוסיף לכמות המוצר הקיים ?
                     </Typography>
                 </DialogContent>
