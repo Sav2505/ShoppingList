@@ -154,18 +154,34 @@ export function useItems() {
       const current = items.find((candidate) => candidate.id === item.id);
       if (!current) return;
 
+      if (current.completed) cancelDeletion(current.id);
       const updated: ShoppingItem = {
         ...current,
         quantity: (current.quantity ?? 1) + amount,
+        completed: false,
+        completedAt: undefined,
       };
       updateItem(updated);
 
       try {
-        const saved = await itemsApi.update(item.id, { quantity: updated.quantity });
+        const saved = await itemsApi.update(item.id, {
+          quantity: updated.quantity,
+          ...(current.completed ? { completed: false, completedAt: null } : {}),
+        });
         updateItem(saved);
-        socketEvents.emitUpdated(saved);
+        if (current.completed) {
+          socketEvents.emitUndo(saved);
+        } else {
+          socketEvents.emitUpdated(saved);
+        }
       } catch {
         updateItem(current);
+        if (current.completed) {
+          const elapsed = current.completedAt
+            ? Date.now() - new Date(current.completedAt).getTime()
+            : 0;
+          scheduleDeletion(current.id, DELETION_DELAY_MS - elapsed);
+        }
         setError('שגיאה בעדכון כמות פריט');
       }
     },

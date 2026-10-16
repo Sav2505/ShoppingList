@@ -46,7 +46,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
             return;
         }
         const existingItem = items.find(
-            (item) => !item.completed && item.name === trimmed && item.category === category,
+            (item) => item.name === trimmed && item.category === category,
         );
         if (existingItem) {
             setDuplicate(existingItem);
@@ -111,7 +111,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
                 </Typography>
                 {!duplicate && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
-                        מה צריך לקנות נונו ?
+                        מה צריך לקנות נורית ?
                     </Typography>
                 )}
             </Box>

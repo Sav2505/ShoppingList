@@ -19,7 +19,10 @@ export const itemsApi = {
     return data;
   },
 
-  update: async (id: number, patch: Partial<ShoppingItem>): Promise<ShoppingItem> => {
+  update: async (
+    id: number,
+    patch: Omit<Partial<ShoppingItem>, 'completedAt'> & { completedAt?: string | null },
+  ): Promise<ShoppingItem> => {
     const { data } = await api.patch<ShoppingItem>(`/${id}`, patch);
     return data;
   },
