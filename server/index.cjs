@@ -145,7 +145,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log(`[WS] client disconnected: ${socket.id}`));
 });
 
-const KEEP_ALIVE_MS = 60 * 1000; // כל דקה
+const KEEP_ALIVE_MS = 10 * 60 * 1000; // כל 10 דקות
 
 function startKeepAlive() {
   // Render מספק את המשתנה הזה אוטומטית
