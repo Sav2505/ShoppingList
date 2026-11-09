@@ -13,6 +13,7 @@ import {
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import type { Category, NewItemPayload, ShoppingItem } from '@/types/item';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
+import { getProductIcon } from './productIcons';
 
 interface AddItemDialogProps {
     open: boolean;
@@ -33,6 +34,7 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
     const [submitting, setSubmitting] = useState(false);
     const [nameError, setNameError] = useState('');
     const [duplicate, setDuplicate] = useState<ShoppingItem | null>(null);
+    const productIcon = getProductIcon(name);
 
     useEffect(() => {
         if (open) {
@@ -153,6 +155,11 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
                                 },
                             }}
                         />
+                        {productIcon && (
+                            <Typography aria-live="polite" sx={{ mt: 0.75, color: 'text.secondary', fontSize: '0.82rem' }}>
+                                {productIcon} הפריט זוהה
+                            </Typography>
+                        )}
                     </Box>
 
                     {/* ── קטגוריה ── */}

@@ -6,6 +6,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { motion } from 'framer-motion';
 import type { ShoppingItem } from '@/types/item';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
+import { getProductIcon } from './productIcons';
 
 interface ItemCardProps {
   item: ShoppingItem;
@@ -16,6 +17,7 @@ interface ItemCardProps {
 export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }: ItemCardProps) {
   const [pressing, setPressing] = useState(false);
   const color = CATEGORY_COLORS[item.category];
+  const productIcon = getProductIcon(item.name);
 
   return (
     <motion.div
@@ -83,6 +85,11 @@ export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }:
               >
                 {item.name}
               </Typography>
+              {productIcon && (
+                <Typography component="span" aria-hidden="true" sx={{ flexShrink: 0, fontSize: '1.2rem', lineHeight: 1 }}>
+                  {productIcon}
+                </Typography>
+              )}
               {item.quantity !== undefined && item.quantity > 1 && (
                 <Box
                   sx={{
