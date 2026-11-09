@@ -191,7 +191,7 @@ function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) 
         whileTap={{ scale: 0.94 }}
         sx={{
           position: 'fixed',
-          bottom: 12,
+          bottom: 16,
           right: 20,
           height: 52,
           px: 3,
