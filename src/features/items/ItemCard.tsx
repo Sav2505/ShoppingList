@@ -85,11 +85,6 @@ export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }:
               >
                 {item.name}
               </Typography>
-              {productIcon && (
-                <Typography component="span" aria-hidden="true" sx={{ flexShrink: 0, fontSize: '1.2rem', lineHeight: 1 }}>
-                  {productIcon}
-                </Typography>
-              )}
               {item.quantity !== undefined && item.quantity > 1 && (
                 <Box
                   sx={{
@@ -107,6 +102,11 @@ export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }:
                 >
                   x{item.quantity}
                 </Box>
+              )}
+              {productIcon && (
+                <Typography component="span" aria-hidden="true" sx={{ flexShrink: 0, fontSize: '1.2rem', lineHeight: 1 }}>
+                  {productIcon}
+                </Typography>
               )}
             </Box>
             <Chip
