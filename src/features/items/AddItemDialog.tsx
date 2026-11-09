@@ -16,6 +16,7 @@ import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
 
 interface AddItemDialogProps {
     open: boolean;
+    username: string;
     defaultCategory: Category;
     items: ShoppingItem[];
     onClose: () => void;
@@ -25,7 +26,7 @@ interface AddItemDialogProps {
 
 const CATEGORIES = Object.entries(CATEGORY_LABELS) as [Category, string][];
 
-export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit, onIncreaseExisting }: AddItemDialogProps) {
+export function AddItemDialog({ open, username, defaultCategory, items, onClose, onSubmit, onIncreaseExisting }: AddItemDialogProps) {
     const [name, setName] = useState('');
     const [category, setCategory] = useState<Category>(defaultCategory);
     const [quantity, setQuantity] = useState<number>(1);
@@ -111,7 +112,7 @@ export function AddItemDialog({ open, defaultCategory, items, onClose, onSubmit,
                 </Typography>
                 {!duplicate && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
-                        מה צריך לקנות נורית ?
+                        מה צריך לקנות {username}?
                     </Typography>
                 )}
             </Box>

@@ -1,7 +1,21 @@
 import axios from 'axios';
 import type { NewItemPayload, ShoppingItem } from '@/types/item';
+import { getToken } from '@/services/auth';
 
 const api = axios.create({ baseURL: '/items' });
+
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+}, undefined, { synchronous: true });
+
+api.interceptors.response.use(undefined, (error) => {
+  if (error.response?.status === 401 && error.config?.headers?.Authorization === `Bearer ${getToken()}`) {
+    window.dispatchEvent(new Event('shopping:unauthorized'));
+  }
+  return Promise.reject(error);
+});
 
 export const itemsApi = {
   getAll: async (): Promise<ShoppingItem[]> => {
@@ -38,7 +52,7 @@ export const itemsApi = {
   undoCompleted: async (id: number): Promise<ShoppingItem> => {
     const { data } = await api.patch<ShoppingItem>(`/${id}`, {
       completed: false,
-      completedAt: undefined,
+      completedAt: null,
     });
     return data;
   },

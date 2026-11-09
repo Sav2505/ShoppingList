@@ -3,6 +3,7 @@ import { itemsApi } from './itemsApi';
 import { useItemsStore } from '@/store/itemsStore';
 import { socketEvents } from '@/services/socket';
 import type { NewItemPayload, ShoppingItem } from '@/types/item';
+import { getAuthGeneration } from '@/services/auth';
 
 // 10 minutes in ms
 const DELETION_DELAY_MS = 10 * 60 * 1000;
@@ -14,8 +15,16 @@ interface UndoSnackbar {
 }
 
 export function useItems() {
-  const { items, setItems, addItem, updateItem, removeItem, loading, setLoading, error, setError } =
-    useItemsStore();
+  const store = useItemsStore();
+  const { items, loading, error } = store;
+  const generation = useRef(getAuthGeneration()).current;
+  const isCurrent = () => generation === getAuthGeneration();
+  const setItems = (value: ShoppingItem[]) => { if (isCurrent()) store.setItems(value); };
+  const addItem = (value: ShoppingItem) => { if (isCurrent()) store.addItem(value); };
+  const updateItem = (value: ShoppingItem) => { if (isCurrent()) store.updateItem(value); };
+  const removeItem = (value: number) => { if (isCurrent()) store.removeItem(value); };
+  const setLoading = (value: boolean) => { if (isCurrent()) store.setLoading(value); };
+  const setError = (value: string | null) => { if (isCurrent()) store.setError(value); };
 
   // Map of itemId → timeout handle for pending deletions
   const deletionTimers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -34,10 +43,12 @@ export function useItems() {
 
   // ── Initial load ────────────────────────────────────────────────────────────
   useEffect(() => {
+    let active = true;
     setLoading(true);
     itemsApi
       .getAll()
       .then((data) => {
+        if (!active || !isCurrent()) return;
         setItems(data);
         // Restart timers for already-completed items loaded from server
         data
@@ -53,10 +64,11 @@ export function useItems() {
             }
           });
       })
-      .catch(() => setError('שגיאה בטעינת הרשימה'))
-      .finally(() => setLoading(false));
+      .catch(() => { if (active) setError('שגיאה בטעינת הרשימה'); })
+      .finally(() => { if (active) setLoading(false); });
 
     return () => {
+      active = false;
       // Cleanup all timers on unmount
       deletionTimers.current.forEach((timer) => clearTimeout(timer));
     };
@@ -99,6 +111,7 @@ export function useItems() {
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
   function scheduleDeletion(id: number, delay: number): void {
+    if (!isCurrent()) return;
     cancelDeletion(id);
     const timer = setTimeout(() => {
       handleDeleteNow(id);
@@ -115,9 +128,9 @@ export function useItems() {
   }
 
   function handleDeleteNow(id: number): void {
+    if (!isCurrent()) return;
     removeItem(id);
     itemsApi.delete(id).catch(() => {/* already gone */});
-    socketEvents.emitDeleted(id);
     deletionTimers.current.delete(id);
   }
 
@@ -140,7 +153,6 @@ export function useItems() {
         // Replace optimistic entry with real server entry
         removeItem(tempId);
         addItem(saved);
-        socketEvents.emitCreated(saved);
       } catch {
         removeItem(tempId);
         setError('שגיאה בהוספת פריט');
@@ -169,11 +181,6 @@ export function useItems() {
           ...(current.completed ? { completed: false, completedAt: null } : {}),
         });
         updateItem(saved);
-        if (current.completed) {
-          socketEvents.emitUndo(saved);
-        } else {
-          socketEvents.emitUpdated(saved);
-        }
       } catch {
         updateItem(current);
         if (current.completed) {
@@ -206,7 +213,6 @@ export function useItems() {
       try {
         const saved = await itemsApi.markCompleted(id);
         updateItem(saved);
-        socketEvents.emitCompleted(saved);
       } catch {
         // Rollback
         updateItem(item);
@@ -233,7 +239,6 @@ export function useItems() {
       try {
         const saved = await itemsApi.undoCompleted(id);
         updateItem(saved);
-        socketEvents.emitUndo(saved);
       } catch {
         // Rollback
         updateItem(item);
@@ -251,7 +256,6 @@ export function useItems() {
       removeItem(id);
       try {
         await itemsApi.delete(id);
-        socketEvents.emitDeleted(id);
       } catch {
         setError('שגיאה במחיקת פריט');
       }

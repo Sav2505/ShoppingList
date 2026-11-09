@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   AppBar,
   Badge,
   Box,
   Container,
+  Button,
+  CircularProgress,
   Fab,
+  IconButton,
+  Tooltip,
   Snackbar,
   Toolbar,
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import LogoutIcon from '@mui/icons-material/Logout';
+import axios from 'axios';
 import type { Category } from '@/types/item';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,8 +24,75 @@ import { AddItemDialog } from './features/items/AddItemDialog';
 import { ItemsList } from './features/items/ItemsList';
 import { useItems } from './features/items/useItems';
 import { useSocketStatus } from './hooks/useSocketStatus';
+import { Login } from './features/auth/Login';
+import { clearToken, getCurrentUser, getToken, invalidateAuthGeneration } from './services/auth';
+import type { User } from './services/auth';
+import { disconnectSocket } from './services/socket';
+import { useItemsStore } from './store/itemsStore';
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [status, setStatus] = useState<'checking' | 'login' | 'ready' | 'offline'>(getToken() ? 'checking' : 'login');
+  const [attempt, setAttempt] = useState(0);
+
+  function logout() {
+    clearToken();
+    disconnectSocket();
+    useItemsStore.setState({ items: [], loading: false, error: null });
+    setUser(null);
+    setStatus('login');
+  }
+
+  useEffect(() => {
+    window.addEventListener('shopping:unauthorized', logout);
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === 'shopping_auth_token') {
+        invalidateAuthGeneration();
+        disconnectSocket();
+        useItemsStore.setState({ items: [], loading: false, error: null });
+        setUser(null);
+        setStatus(getToken() ? 'checking' : 'login');
+        setAttempt((value) => value + 1);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('shopping:unauthorized', logout);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    let active = true;
+    setStatus('checking');
+    getCurrentUser(token).then((currentUser) => {
+      if (active && getToken() === token) {
+        setUser(currentUser);
+        setStatus('ready');
+      }
+    }).catch((error: unknown) => {
+      if (!active || getToken() !== token) return;
+      if (axios.isAxiosError(error) && error.response?.status === 401) logout();
+      else setStatus('offline');
+    });
+    return () => { active = false; };
+  }, [attempt]);
+
+  if (status === 'login') return <Login onLogin={(currentUser) => { setUser(currentUser); setStatus('ready'); }} />;
+  if (status === 'checking') return <Box sx={{ minHeight: '100dvh', display: 'grid', placeItems: 'center' }}><CircularProgress /></Box>;
+  if (status === 'offline') return (
+    <Container maxWidth="xs" sx={{ pt: 10, textAlign: 'center' }}>
+      <Alert severity="error">לא ניתן להתחבר לשרת כרגע.</Alert>
+      <Button onClick={() => setAttempt((value) => value + 1)} sx={{ mt: 2 }}>ניסיון חוזר</Button>
+      <Button onClick={logout} sx={{ mt: 2 }}>החלפת חשבון</Button>
+    </Container>
+  );
+  return user ? <ShoppingList user={user} onLogout={logout} /> : null;
+}
+
+function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [activeCategory, setActiveCategory] = useState<'all' | Category>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const {
@@ -63,7 +136,7 @@ export default function App() {
               variant="h6"
               sx={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff', letterSpacing: '-0.3px', lineHeight: 1.2 }}
             >
-              הקניות של נורית
+              רשימת הקניות של {user.username}
             </Typography>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem' }}>
               רשימת קניות משותפת
@@ -71,6 +144,7 @@ export default function App() {
           </Box>
 
           {/* RTL left-side: live dot */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box
             sx={{
               width: 9, height: 9, borderRadius: '50%',
@@ -79,6 +153,12 @@ export default function App() {
               transition: 'all 0.4s',
             }}
           />
+          <Tooltip title="התנתקות והחלפת חשבון">
+            <IconButton aria-label="התנתקות והחלפת חשבון" onClick={onLogout} sx={{ color: 'white' }}>
+              <LogoutIcon />
+            </IconButton>
+          </Tooltip>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -133,6 +213,7 @@ export default function App() {
       {/* ── Add Dialog ── */}
       <AddItemDialog
         open={dialogOpen}
+        username={user.username}
         onClose={() => setDialogOpen(false)}
         onSubmit={addNewItem}
         onIncreaseExisting={increaseItemQuantity}
