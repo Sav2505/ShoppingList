@@ -32,7 +32,7 @@ export function Login({ onLogin }: { onLogin: (user: User) => void }) {
       <Container maxWidth="xs">
         <Paper elevation={0} sx={{ p: { xs: 3, sm: 4 }, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
           <ShoppingCartOutlinedIcon color="primary" sx={{ fontSize: 36, mb: 1 }} />
-          <Typography variant="h5" fontWeight={800} component="h1">רשימת הקניות שלי</Typography>
+          <Typography variant="h5" fontWeight={800} component="h1">הקניות שלי</Typography>
           <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>התחברות לחשבון</Typography>
           <Box component="form" onSubmit={submit} sx={{ display: 'grid', gap: 2 }}>
             {error && <Alert severity="error">{error}</Alert>}
