@@ -129,7 +129,7 @@ export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete, o
           </Box>
 
           {/* Actions — trailing side (left in RTL) */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.35 }}>
             <IconButton
               size="small"
               aria-label={`עריכת ${item.name}`}
