@@ -17,7 +17,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
-import type { Category } from '@/types/item';
+import type { Category, ShoppingItem } from '@/types/item';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AddItemDialog } from './features/items/AddItemDialog';
@@ -95,9 +95,10 @@ export default function App() {
 function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [activeCategory, setActiveCategory] = useState<'all' | Category>('all');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
   const {
     items, loading, error, snackbar,
-    addNewItem, increaseItemQuantity, markBought, undoBought, deleteItem, closeSnackbar,
+    addNewItem, increaseItemQuantity, editItem, markBought, undoBought, deleteItem, closeSnackbar,
   } = useItems();
   const connected = useSocketStatus();
   const activeCount = items.filter((i) => !i.completed).length;
@@ -176,6 +177,7 @@ function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) 
           loading={loading}
           onMarkBought={markBought}
           onDelete={deleteItem}
+          onEdit={(item) => { setEditingItem(item); setDialogOpen(true); }}
           filter={activeCategory}
           onFilterChange={setActiveCategory}
         />
@@ -185,7 +187,7 @@ function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) 
       <Fab
         variant="extended"
         aria-label="הוסף פריט"
-        onClick={() => setDialogOpen(true)}
+        onClick={() => { setEditingItem(null); setDialogOpen(true); }}
         component={motion.button}
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.94 }}
@@ -214,8 +216,10 @@ function ShoppingList({ user, onLogout }: { user: User; onLogout: () => void }) 
       <AddItemDialog
         open={dialogOpen}
         username={user.username}
-        onClose={() => setDialogOpen(false)}
+        editingItem={editingItem}
+        onClose={() => { setDialogOpen(false); setEditingItem(null); }}
         onSubmit={addNewItem}
+        onUpdate={editItem}
         onIncreaseExisting={increaseItemQuantity}
         items={items}
         defaultCategory={activeCategory === 'all' ? 'supermarket' : activeCategory}

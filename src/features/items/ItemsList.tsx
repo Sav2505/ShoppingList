@@ -12,6 +12,7 @@ interface ItemsListProps {
   loading: boolean;
   onMarkBought: (id: number) => void;
   onDelete: (id: number) => void;
+  onEdit: (item: ShoppingItem) => void;
   filter: 'all' | Category;
   onFilterChange: (category: 'all' | Category) => void;
 }
@@ -25,6 +26,7 @@ export function ItemsList({
   loading,
   onMarkBought,
   onDelete,
+  onEdit,
   filter,
   onFilterChange,
 }: ItemsListProps) {
@@ -151,7 +153,7 @@ export function ItemsList({
       {/* ── Active items ── */}
       <AnimatePresence mode="popLayout">
         {activeItems.map((item) => (
-          <ItemCard key={item.id} item={item} onMarkBought={onMarkBought} onDelete={onDelete} />
+          <ItemCard key={item.id} item={item} onMarkBought={onMarkBought} onDelete={onDelete} onEdit={onEdit} />
         ))}
       </AnimatePresence>
 
@@ -167,7 +169,7 @@ export function ItemsList({
           </Box>
           <AnimatePresence mode="popLayout">
             {completedItems.map((item) => (
-              <ItemCard key={item.id} item={item} onMarkBought={onMarkBought} onDelete={onDelete} />
+              <ItemCard key={item.id} item={item} onMarkBought={onMarkBought} onDelete={onDelete} onEdit={onEdit} />
             ))}
           </AnimatePresence>
         </>

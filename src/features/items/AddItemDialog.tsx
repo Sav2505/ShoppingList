@@ -11,6 +11,7 @@ import {
     type SelectChangeEvent,
 } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import type { Category, NewItemPayload, ShoppingItem } from '@/types/item';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
 import { getProductIcon } from './productIcons';
@@ -22,12 +23,14 @@ interface AddItemDialogProps {
     items: ShoppingItem[];
     onClose: () => void;
     onSubmit: (payload: NewItemPayload) => Promise<void>;
+    editingItem?: ShoppingItem | null;
+    onUpdate?: (id: number, payload: NewItemPayload) => Promise<void>;
     onIncreaseExisting: (item: ShoppingItem, amount: number) => Promise<void>;
 }
 
 const CATEGORIES = Object.entries(CATEGORY_LABELS) as [Category, string][];
 
-export function AddItemDialog({ open, username, defaultCategory, items, onClose, onSubmit, onIncreaseExisting }: AddItemDialogProps) {
+export function AddItemDialog({ open, username, defaultCategory, items, onClose, onSubmit, editingItem = null, onUpdate, onIncreaseExisting }: AddItemDialogProps) {
     const [name, setName] = useState('');
     const [category, setCategory] = useState<Category>(defaultCategory);
     const [quantity, setQuantity] = useState<number>(1);
@@ -38,9 +41,13 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
 
     useEffect(() => {
         if (open) {
-            setCategory(defaultCategory);
+            setName(editingItem?.name ?? '');
+            setCategory(editingItem?.category ?? defaultCategory);
+            setQuantity(editingItem?.quantity ?? 1);
+            setNameError('');
+            setDuplicate(null);
         }
-    }, [open, defaultCategory]);
+    }, [open, defaultCategory, editingItem]);
 
     const handleSubmit = async () => {
         const trimmed = name.trim();
@@ -49,15 +56,24 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
             return;
         }
         const existingItem = items.find(
-            (item) => item.name === trimmed && item.category === category,
+            (item) => item.id !== editingItem?.id && item.name === trimmed && item.category === category,
         );
         if (existingItem) {
+            if (editingItem) {
+                setNameError('כבר קיים פריט בשם הזה בקטגוריה שנבחרה');
+                return;
+            }
             setDuplicate(existingItem);
             return;
         }
         setSubmitting(true);
         try {
-            await onSubmit({ name: trimmed, category, quantity });
+            const payload = { name: trimmed, category, quantity };
+            if (editingItem) {
+                await onUpdate?.(editingItem.id, payload);
+            } else {
+                await onSubmit(payload);
+            }
             handleClose();
         } finally {
             setSubmitting(false);
@@ -110,11 +126,11 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
             {/* Title */}
             <Box sx={{ px: 3, pt: { xs: 1.5, sm: 3 }, pb: 0 }}>
                 <Typography variant="h6" fontWeight={800} sx={{ fontSize: '1.1rem' }}>
-                    {duplicate ? 'המוצר כבר קיים' : 'הוסף פריט לרשימה'}
+                    {duplicate ? 'המוצר כבר קיים' : editingItem ? 'עריכת פריט' : 'הוסף פריט לרשימה'}
                 </Typography>
                 {!duplicate && (
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.3, fontSize: '0.82rem' }}>
-                        מה צריך לקנות {username}?
+                        {editingItem ? 'עדכן את פרטי הפריט' : `מה צריך לקנות ${username}?`}
                     </Typography>
                 )}
             </Box>
@@ -237,7 +253,7 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
                     variant="contained"
                     onClick={duplicate ? handleConfirmDuplicate : handleSubmit}
                     disabled={submitting}
-                    endIcon={<AddShoppingCartIcon sx={{ fontSize: 20 }} />}
+                    endIcon={editingItem ? <EditOutlinedIcon sx={{ fontSize: 20 }} /> : <AddShoppingCartIcon sx={{ fontSize: 20 }} />}
                     sx={{
                         flex: 2,
                         py: 1.35,
@@ -250,7 +266,7 @@ export function AddItemDialog({ open, username, defaultCategory, items, onClose,
                         '&:disabled': { opacity: 0.6 },
                     }}
                 >
-                    הוסף
+                    {editingItem ? 'שמור שינויים' : 'הוסף'}
                 </Button>
             </Box>
         </Dialog>

@@ -195,6 +195,25 @@ export function useItems() {
     [items, updateItem, setError],
   );
 
+  const editItem = useCallback(
+    async (id: number, payload: NewItemPayload): Promise<void> => {
+      const current = items.find((item) => item.id === id);
+      if (!current) return;
+
+      const updated: ShoppingItem = { ...current, ...payload };
+      updateItem(updated);
+
+      try {
+        const saved = await itemsApi.update(id, payload);
+        updateItem(saved);
+      } catch {
+        updateItem(current);
+        setError('שגיאה בעדכון פריט');
+      }
+    },
+    [items, updateItem, setError],
+  );
+
   const markBought = useCallback(
     async (id: number): Promise<void> => {
       const item = items.find((i) => i.id === id);
@@ -275,6 +294,7 @@ export function useItems() {
     snackbar,
     addNewItem,
     increaseItemQuantity,
+    editItem,
     markBought,
     undoBought,
     deleteItem,

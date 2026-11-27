@@ -3,6 +3,7 @@ import { Box, Card, Chip, IconButton, Typography } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { motion } from 'framer-motion';
 import type { ShoppingItem } from '@/types/item';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '@/types/item';
@@ -12,9 +13,10 @@ interface ItemCardProps {
   item: ShoppingItem;
   onMarkBought: (id: number) => void;
   onDelete: (id: number) => void;
+  onEdit: (item: ShoppingItem) => void;
 }
 
-export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }: ItemCardProps) {
+export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete, onEdit }: ItemCardProps) {
   const [pressing, setPressing] = useState(false);
   const color = CATEGORY_COLORS[item.category];
   const productIcon = getProductIcon(item.name);
@@ -126,19 +128,35 @@ export const ItemCard = memo(function ItemCard({ item, onMarkBought, onDelete }:
             />
           </Box>
 
-          {/* Delete — trailing side (left in RTL) */}
-          <IconButton
-            size="small"
-            onClick={() => onDelete(item.id)}
-            sx={{
-              p: 0.4,
-              color: 'rgba(0,0,0,0.14)',
-              transition: 'all 0.2s',
-              '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.07)', transform: 'scale(1.12)' },
-            }}
-          >
-            <DeleteOutlineIcon sx={{ fontSize: 19 }} />
-          </IconButton>
+          {/* Actions — trailing side (left in RTL) */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+            <IconButton
+              size="small"
+              aria-label={`עריכת ${item.name}`}
+              onClick={() => onEdit(item)}
+              sx={{
+                p: 0.4,
+                color: 'rgba(0,0,0,0.28)',
+                transition: 'all 0.2s',
+                '&:hover': { color: 'primary.main', bgcolor: 'rgba(79,70,229,0.07)', transform: 'scale(1.12)' },
+              }}
+            >
+              <EditOutlinedIcon sx={{ fontSize: 19 }} />
+            </IconButton>
+            <IconButton
+              size="small"
+              aria-label={`מחיקת ${item.name}`}
+              onClick={() => onDelete(item.id)}
+              sx={{
+                p: 0.4,
+                color: 'rgba(0,0,0,0.14)',
+                transition: 'all 0.2s',
+                '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.07)', transform: 'scale(1.12)' },
+              }}
+            >
+              <DeleteOutlineIcon sx={{ fontSize: 19 }} />
+            </IconButton>
+          </Box>
         </Box>
       </Card>
     </motion.div>
